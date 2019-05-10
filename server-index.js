@@ -439,7 +439,7 @@ io.sockets.on("connection", function(socket)
 			}
 
 			// write scoreboad
-			fs.writeFileSync(scoreboardFile, JSON.stringify(writeObj), function(err) { if (err) throw err; });
+			fs.writeFileSync(scoreboardFile, JSON.stringify(writeObj));
 		}
 		
 		destroySession(socket.id, "Game Ended", closeTime);
