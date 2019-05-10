@@ -1,3 +1,16 @@
 gamedata/*.json
 
 *.swp
+
+.bluemix/*
+.cfignore
+.dockerignore
+.ibm-project
+Dockerfile
+Dockerfile-tools
+Jenkinsfile
+chart/*
+cli-config.yml
+manifest.yml
+run-debug
+run-dev
