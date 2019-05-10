@@ -1,0 +1,7 @@
+{
+	"enable_editor": true,
+	"scoreboards": true,
+	"ping_tolerance": 3,
+	"tick_tolerance": 2,
+	"max_accusations": 3
+}

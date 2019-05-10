@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Word-Type-Inator Level Creator</title>
+		<link href="styles.css" rel="stylesheet"/>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<div align="center">
+			<h1>Level Creator</h1>
+			<form id="creator_form">
+				<table>
+					<tr>
+						<td align="right">Level title:</td>
+						<td><input type="text" id="title_input"/></td>
+					</tr>
+					<tr>
+						<td align="right">Use timelimit:</td>
+						<td><input type="checkbox" id="use_timelimit_input"/></td>
+					</tr>
+					<tr>
+						<td align="right">Initial time:</td>
+						<td><input type="number" id="initial_time_input"/></td>
+					</tr>
+					<tr>
+						<td aling="right">Max time accumulated:</td>
+						<td><input type="number" id="max_time_accumulated_input"/></td>
+					</tr>
+					<tr>
+						<td align="right">Time per symbol:</td>
+						<td><input type="number" id="time_per_symbol_input"/></td>
+					</tr>
+					<tr>
+						<td align="right">Words:</td>
+						<td><input type="text" id="words_input"/></td>
+					</tr>
+					<tr>
+						<td align="right"><input type="button" id="cancel_button" value="Cancel And Exit"/></td>
+						<td><input type="button" id="send_button" value="Send!"/></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><input type="text"  class="status_text" disabled id="status_text"/></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+
+		<div id="to_remove">
+			<script src="creator-index.js"></script>
+			<script>
+				document.getElementById("to_remove").remove();
+			</script>
+		</div>
+	</body>
+</html>
