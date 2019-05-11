@@ -2,7 +2,7 @@ _Oh! Player the human! How unexpected, and by that I mean... COMPLETELY UNEXPECT
 # word-type-inator
 A simple word typing game for Node.js
 
-An up-to-date version of the game is playable at: http://wordtypeinator.eu-gb.cf.appdomain.cloud/
+An up-to-date version of the game is playable at: https://gregthemadmonk-word-type-inator.glitch.me/
 
 No levels to play? Feel free to create one!
 
