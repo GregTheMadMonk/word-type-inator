@@ -1,3 +1,5 @@
+<img src="logo.png" height="65px" width="65px"></img>
+
 _Oh! Player the human! How unexpected, and by that I mean... COMPLETELY UNEXPECTED!_
 # word-type-inator
 A simple word typing game for Node.js
