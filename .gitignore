@@ -1,6 +1,6 @@
 gamedata/*.json
 
-*.swp
+*.sw*
 
 .bluemix/*
 .cfignore

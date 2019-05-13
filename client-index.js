@@ -433,6 +433,7 @@ function mainGameRenderer()
 	context.clearRect(0, 0, canvas.width, canvas.height);
 
 	const textSize = canvas.height / 5 * wordScale;
+	const upcomingSize = canvas.height / 15;
 	context.font = textSize + "px Arial";
 
 	const word = gameData.words[wordIndex].toUpperCase();
@@ -442,10 +443,25 @@ function mainGameRenderer()
 	const stringWidth = context.measureText(word).width;
 	const preWidth = context.measureText(preWord).width;
 
+	// draw the current word
 	context.fillStyle = "#FF0000";
 	context.fillText(preWord, (canvas.width - stringWidth) / 2, (canvas.height + textSize / 2) / 2);
 	context.fillStyle = "#000000";
 	context.fillText(postWord, (canvas.width - stringWidth) / 2 + preWidth, (canvas.height + textSize / 2) / 2);
+
+	// draw the upcoming words
+	context.font = upcomingSize + "px Arial";
+	context.fillStyle = "#777777";
+
+	var coming = "";
+	for (var i = wordIndex + 1; context.measureText(coming).width < canvas.width / 2; i++)
+	{
+		if (i == gameData.words.length) i = 0;
+		coming = coming + " " + gameData.words[i].toUpperCase();
+	}
+
+	var shift = 2 * (wordScale - 1) * context.measureText(gameData.words[wordIndex]).width;
+	context.fillText(coming, canvas.width / 2 + shift, canvas.height / 2 + canvas.height / 10 + upcomingSize / 2);
 
 	// draw bottom bar
 	const percent = wordIndex * 1.0 / gameData.words.length; // list progress

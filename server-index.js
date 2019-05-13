@@ -210,8 +210,11 @@ function serverTick()
 		serverTime = parseInt(serverTime) + tickDelta; // tick if there are active sessions
 		for (var i = 0; i < sessions.length; i++)
 		{
-			if (sessions[i] != null) sessions[i].socket.emit("adjustTime", { deltaTime: -sessions[i].sessionDelta });
-			sessions[i].sessionDelta = 0;
+			if (sessions[i] != null) 
+			{
+				sessions[i].sessionDelta = 0;
+				sessions[i].socket.emit("adjustTime", { deltaTime: -sessions[i].sessionDelta });
+			}
 		}
 	}
 	else serverTime = 0; // else clear the timer
