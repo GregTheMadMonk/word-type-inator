@@ -668,7 +668,7 @@ username = window.sessionStorage.getItem("wordsUsername");
 if (!username)
 {
 	username = prompt("Select yourself a username", "");
-	window.sessionStorage.setItem("wordsUsername", username);
+	if (username) window.sessionStorage.setItem("wordsUsername", username); // don't remember if something went wrong
 }
 
 loadMainMenu();
