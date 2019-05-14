@@ -571,7 +571,7 @@ function scoreRenderer()
 
 	if (scoreboardReady)
 	{	// draw highscores
-		const scoreboardMessage = "MAX SYMOLS PER SECOND: " + scoreboard.symPerSec + " by " + scoreboard.symPerSecHolder + " | MAX WORDS: " + scoreboard.words + " by " + scoreboard.wordsHolder;
+		const scoreboardMessage = "MAX SYMBOLS PER SECOND: " + scoreboard.symPerSec + " by " + scoreboard.symPerSecHolder + " | MAX WORDS: " + scoreboard.words + " by " + scoreboard.wordsHolder;
 		context.fillText(scoreboardMessage, (canvas.width - context.measureText(scoreboardMessage).width) / 2, y + secondaryHeight * 2); 
 	}
 
