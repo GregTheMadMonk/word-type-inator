@@ -3,6 +3,7 @@
 var socket = io();
 
 var gamedatafiles = []; // gamedata files list
+var serverStats = null; // server stats
 
 // menu helper vars
 var menuEntry = 0;
@@ -11,7 +12,8 @@ var menuEntryMax = 0;
 const mainMenuEntries =
 [
 	"PLAY",
-	"CREATE A LEVEL"
+	"CREATE A LEVEL",
+	"CHANGE USERNAME"
 ];
 
 // canvas
@@ -27,6 +29,8 @@ var prevListener = null;
 
 // user defined data
 var username = "Unknown Hero";
+var newUsername = "";
+var canCancelLogin = false;
 
 // game data
 var gameData = 	// current game data object
@@ -102,11 +106,24 @@ function runRendererAndInput()
 	prevListener = inputFunction;
 }
 
+/*****************************************
+ * Shows a screen with a username request
+ *****************************************/
+function loadLoginScreen()
+{
+	newUsername = username;
+	renderFunction = loginScreenRenderer;
+	inputFunction = loginScreenInput;
+
+	runRendererAndInput();
+}
+
 /*********************
  * Load the main menu
  *********************/
 function loadMainMenu()
 {
+	socket.emit("requestServerStats");
 	// prepare helper vars
 	menuEntry = 0;
 	menuEntryMax = mainMenuEntries.length - 1;
@@ -179,21 +196,118 @@ function loadScoreScreen()
 }
 
 /*****************************************************
+ * Draws the screen with an invite to pick a username
+ *****************************************************/
+function loginScreenRenderer()
+{
+	context.clearRect(0, 0, canvas.width, canvas.height);
+
+	const invite = "PICK A USERNAME";
+
+	const fontSize = canvas.height / 10;
+	const helperSize = canvas.height / 40; // helper font size
+
+	context.font = fontSize + "px Arial";
+	// print header
+	context.fillStyle = "#FF0000";
+	context.fillText(invite, (canvas.width - context.measureText(invite).width) / 2, canvas.height / 2 - 10);
+	
+	// print username
+	context.fillStyle = "#000000";
+	if (!newUsername) newUsername = "";
+	context.fillText(newUsername + "|", (canvas.width - context.measureText(newUsername + "|").width) / 2, canvas.height / 2 + fontSize);
+
+	//print helper
+	const helper = "" + ((newUsername)?"<ENTER> = CONTINUE":"") + ((newUsername && canCancelLogin)?", ":"") + ((canCancelLogin)?"<ESC> = CANCEL":"");
+	context.fillStyle = "#777777";
+	context.font = helperSize + "px Arial";
+	context.fillText(helper, (canvas.width - context.measureText(helper).width) / 2, canvas.height - 10);
+}
+
+/*****************************
+ * Handles login screen input
+ *****************************/
+function loginScreenInput(e)
+{
+	switch(e.key)
+	{
+		case "Enter":
+			if (newUsername) 
+			{
+				username = newUsername;
+				window.sessionStorage.setItem("wordsUsername", username); // don't remember if something went wrong
+				loadMainMenu();
+			}
+			break;
+		case "Escape":
+			loadMainMenu();
+			break;
+		case "Backspace":
+			newUsername = newUsername.substring(0, newUsername.length - 1);
+			break;
+		default:
+			if ("abcdefghijklmnopqrstuvwxyz".lastIndexOf(e.key.toLowerCase()) != -1)
+				newUsername += e.key;
+			break;
+	}
+}
+
+/*****************************************************
  * Main menu rednerer function: Redners the main menu
  *****************************************************/
 function mainMenuRenderer()
 {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 
-	const menuEntryHeight = canvas.height / 5 * wordScale;
+	const menuEntryHeight = canvas.height / 10;
 
-	context.font = menuEntryHeight + "px Arial";
+	context.font = menuEntryHeight * wordScale + "px Arial";
 	
 	for (var i = 0; i < mainMenuEntries.length; i++)
 	{
 		if (i == menuEntry) context.fillStyle = "#FF0000";
 		else context.fillStyle = "#000000";
 		context.fillText(mainMenuEntries[i], (canvas.width - context.measureText(mainMenuEntries[i]).width) / 2, (i + 2) * menuEntryHeight);
+	}
+
+	//print helper
+	const helperSize = canvas.height / 40; // helper font size
+	const helper = "<ENTER> = SELECT";
+	context.fillStyle = "#777777";
+	context.font = helperSize + "px Arial";
+	context.fillText(helper, (canvas.width - context.measureText(helper).width) / 2, canvas.height - 10);
+
+	// Print splash
+	var splashText = "";
+	if (serverStats)
+	{
+		context.font = helperSize * 2 + "px Arial";
+		const rotAngle = 1.0;
+		var y0 = (mainMenuEntries.length + 1.5) * menuEntryHeight;
+		var x0 = canvas.width * 4 / 5;
+		/* Look at me flexing
+		 * x0 = x * cos(a) + y * sin(a) = 0
+		 * y0 = -x * sin(a) + y * cos(a)
+		 */
+		context.rotate(rotAngle);
+		var x = x0 * Math.cos(rotAngle) + y0 * Math.sin(rotAngle);
+		var y = -x0 * Math.sin(rotAngle) + y0 * Math.cos(rotAngle);
+		if (serverStats.logins) 
+		{
+			context.fillText(serverStats.logins + " player logins", x, y);
+			x0 -= helperSize * 2.5;
+			x = x0 * Math.cos(rotAngle) + y0 * Math.sin(rotAngle);
+			y = -x0 * Math.sin(rotAngle) + y0 * Math.cos(rotAngle);
+		}
+		if (serverStats.levels_played) 
+		{
+			context.fillText(serverStats.levels_played + " levels played", x, y);
+			x0 -= helperSize * 2.5;
+			x = x0 * Math.cos(rotAngle) + y0 * Math.sin(rotAngle);
+			y = -x0 * Math.sin(rotAngle) + y0 * Math.cos(rotAngle);
+		}
+		context.fillText("on the record!", x, y);
+		context.rotate(-rotAngle);
 	}
 
 	wordScale = (wordScale + 1.0) / 2;
@@ -220,8 +334,12 @@ function mainMenuInput(e)
 				case 0:	// "Play"
 					loadFilePicker();
 					break;
-				case 1:
+				case 1: // Level creator
 					window.location.href = "creator.html";
+					break;
+				case 2: // Name changer
+					canCancelLogin = true;
+					loadLoginScreen();
 					break;
 			}
 			break;
@@ -236,7 +354,7 @@ function filePickRenderer()
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	const header = "SELECT A LEVEL";
 	const headerSize = canvas.height / 20;
-	const helperSize = canvas.height / 40; // header font size
+	const helperSize = canvas.height / 40; // helper font size
 
 	// draw the header
 	context.fillStyle = "#000000"; // i doubt it really needs a header
@@ -341,8 +459,9 @@ function filePickInput(e)
 function scoreboardRenderer()
 {
 	var header;
-	const headerSize = 50; // header font size
-	const entrySize = 30; // list font size
+	const headerSize = canvas.height / 30; // header font size
+	const entrySize = canvas.height / 35; // list font size
+	const helperSize = canvas.height / 40;
 
 	if (scoreboardReady) header = gameData.title + " Scoreboard";
 	else header = "Loading...";
@@ -370,6 +489,7 @@ function scoreboardRenderer()
 	}
 
 	// draw helper message
+	context.font = helperSize + "px Arial";
 	context.fillStyle = "#777777";
 	const helper = "<ESC> = BACK";
 	context.fillText(helper, (canvas.width - context.measureText(helper).width) / 2, canvas.height - 10);
@@ -646,6 +766,11 @@ function init()
 		scoreboard = data;
 	});
 
+	socket.on("recieveServerStats", function(data)
+	{
+		serverStats = data;
+	});
+
 	socket.on("sessionAddSuccess", function(data) { socket.emit("clientPong", null); connectionStatus.connected = true; });
 	
 	socket.on("sessionRemoved", function(data) 
@@ -665,11 +790,6 @@ window.onresize = init_canvas;
 init(); // initialize the game
 
 username = window.sessionStorage.getItem("wordsUsername");
-if (!username)
-{
-	username = prompt("Select yourself a username", "");
-	if (username) window.sessionStorage.setItem("wordsUsername", username); // don't remember if something went wrong
-}
-
-loadMainMenu();
+if (!username) loadLoginScreen();
+else loadMainMenu();
 })();

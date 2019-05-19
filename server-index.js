@@ -125,6 +125,7 @@ function getFileList()
 	{
 		if (entry.lastIndexOf(gameDataFileExt) + gameDataFileExt.length == entry.length) // only .json
 		if (entry.lastIndexOf(".scoreboard.json") == -1) // ignore scoreboards
+		if (entry.lastIndexOf("server-stats.json") == -1) // ignore stats file
 		{ 	// does it match the extension?
 			console.log(entry);
 			files[j] = getGameData(entry);
@@ -281,6 +282,35 @@ io.sockets.on("connection", function(socket)
 {
 	console.log("Connection!");
 
+	var stats = null;
+	if (config.stats)
+	{
+		const statsFile = __dirname + "/gamedata/server-stats.json";
+		try
+		{
+			stats = JSON.parse(fs.readFileSync(statsFile).toString());
+		}
+		catch (e) 
+		{
+			console.log(e.toString());
+			stats =
+			{
+				"logins": 0,
+				"levels_played": 0
+			};
+		}
+
+		stats.logins++;
+		
+		fs.writeFileSync(statsFile, JSON.stringify(stats));
+	}
+
+	// Server stats (logins etc.) request
+	socket.on("requestServerStats", function(data)
+	{
+		socket.emit("recieveServerStats", stats);		
+	});
+
 	// Game data request from a client
 	socket.on("requestGameDataFiles", function(data)
 	{
@@ -298,6 +328,30 @@ io.sockets.on("connection", function(socket)
 	socket.on("gameStart", function(data)
 	{
 		console.log(data);
+
+		// update "levels played" stat
+		if (config.stats)
+		{
+			const statsFile = __dirname + "/gamedata/server-stats.json";
+			try
+			{
+				stats = JSON.parse(fs.readFileSync(statsFile).toString());
+			}
+			catch (e) 
+			{
+				console.log(e.toString());
+				stats =
+				{
+					"logins": 0,
+					"levels_played": 0
+				};
+			}
+	
+			stats.levels_played++;
+		
+			fs.writeFileSync(statsFile, JSON.stringify(stats));
+		}
+
 		for (var i = 0; i <= sessions.length; i++) // find the first empty session
 			if (!sessions[i])
 			{
