@@ -789,7 +789,15 @@ window.onresize = init_canvas;
 
 init(); // initialize the game
 
-username = window.sessionStorage.getItem("wordsUsername");
+try
+{
+	username = window.sessionStorage.getItem("wordsUsername");
+}
+catch (e)
+{
+	console.log(e.toString());
+	username = null;
+}
 if (!username) loadLoginScreen();
 else loadMainMenu();
 })();
