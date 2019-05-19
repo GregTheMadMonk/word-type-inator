@@ -240,7 +240,7 @@ function loginScreenInput(e)
 			}
 			break;
 		case "Escape":
-			loadMainMenu();
+			if (canCancelLogin) loadMainMenu();
 			break;
 		case "Backspace":
 			newUsername = newUsername.substring(0, newUsername.length - 1);
@@ -796,6 +796,7 @@ try
 catch (e)
 {
 	console.log(e.toString());
+	alert("Session storage is not supported, so you will be asked to login every time you try to access the game. To avoid that, open the game in a separate window. Have fun!");
 	username = null;
 }
 if (!username) loadLoginScreen();
