@@ -796,7 +796,7 @@ try
 catch (e)
 {
 	console.log(e.toString());
-	alert("Session storage is not supported, so you will be asked to login every time you try to access the game. To avoid that, open the game in a separate window. Have fun!");
+	alert("Session storage is not supported, so you will be asked to login every time you try to access the game. \nIf you are trying to access game from glitch, Enter button might also not work for you.\nTo avoid all that, open the game in a separate window. Have fun!");
 	username = null;
 }
 if (!username) loadLoginScreen();
